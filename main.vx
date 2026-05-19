@@ -1,0 +1,104 @@
+// main.vx - Главное ядро VertexOS
+
+include "colors.vx"
+include "graphics.vx"
+include "fonts.vx"
+include "cursor.vx"
+include "ui.vx"
+
+let running = 1;
+let colors = get_default_theme();
+
+let btn_theme1: Button;
+btn_theme1.x = 100;
+btn_theme1.y = 150;
+btn_theme1.w = 200;
+btn_theme1.h = 50;
+btn_theme1.text = "Dark Theme";
+btn_theme1.hover = 0;
+
+let btn_theme2: Button;
+btn_theme2.x = 100;
+btn_theme2.y = 220;
+btn_theme2.w = 200;
+btn_theme2.h = 50;
+btn_theme2.text = "Light Theme";
+btn_theme2.hover = 0;
+
+let btn_exit: Button;
+btn_exit.x = 100;
+btn_exit.y = 450;
+btn_exit.w = 200;
+btn_exit.h = 50;
+btn_exit.text = "Exit";
+btn_exit.hover = 0;
+
+export fn _start() {
+    // Градиентный фон
+    let mut y = 0;
+    while y < HEIGHT {
+        let t = y as f32 / HEIGHT as f32;
+        let r = (0x1A as f32 * (1.0 - t) + 0x16 as f32 * t) as u32;
+        let g = (0x1A as f32 * (1.0 - t) + 0x21 as f32 * t) as u32;
+        let b = (0x2E as f32 * (1.0 - t) + 0x3E as f32 * t) as u32;
+        let color = (r << 16) | (g << 8) | b;
+        
+        let mut x = 0;
+        while x < WIDTH {
+            draw_pixel(x, y, color);
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+    
+    // Заголовок
+    draw_string(300, 40, "VERTEXOS", colors.accent);
+    draw_string(280, 60, "SYSTEM SETTINGS", colors.text);
+    
+    // Декоративный круг
+    draw_circle(50, 50, 25, colors.accent);
+    draw_circle(50, 50, 20, colors.background);
+    
+    // Главный цикл
+    while running != 0 {
+        // Получаем состояние мыши от VM
+        let mx = get_mouse_x();
+        let my = get_mouse_y();
+        let mouse_pressed = is_mouse_pressed();
+        
+        update_cursor(mx, my);
+        
+        // Обновляем hover состояние кнопок
+        btn_theme1.hover = is_hover(&btn_theme1, mx, my);
+        btn_theme2.hover = is_hover(&btn_theme2, mx, my);
+        btn_exit.hover = is_hover(&btn_exit, mx, my);
+        
+        // Обновляем курсор (крестик/кружок)
+        let hover = btn_theme1.hover | btn_theme2.hover | btn_exit.hover;
+        set_cursor_hover(hover);
+        
+        // Обработка кликов
+        if mouse_pressed != 0 {
+            if btn_theme1.hover != 0 {
+                colors = get_dark_theme();
+            }
+            if btn_theme2.hover != 0 {
+                colors = get_default_theme();
+            }
+            if btn_exit.hover != 0 {
+                running = 0;
+            }
+        }
+        
+        // Рисуем кнопки
+        draw_button(&btn_theme1, &colors);
+        draw_button(&btn_theme2, &colors);
+        draw_button(&btn_exit, &colors);
+        
+        // Рисуем курсор поверх всего
+        draw_cursor();
+        
+        // Обновляем экран
+        flush_framebuffer();
+    }
+}

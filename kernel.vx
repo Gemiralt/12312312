@@ -1,0 +1,177 @@
+// kernel.vx - Настоящее ядро VertexOS
+
+// Константы
+let VGA_BASE = 0xB8000 as *mut u8;
+let SCREEN_WIDTH = 80;
+let SCREEN_HEIGHT = 25;
+let TAB_SIZE = 4;
+
+// Переменные ядра
+let mut cursor_x = 0;
+let mut cursor_y = 0;
+let mut color = 0x0F; // белый на чёрном
+
+// Очистка экрана
+fn clear_screen() {
+    for y in 0..SCREEN_HEIGHT {
+        for x in 0..SCREEN_WIDTH {
+            let pos = y * SCREEN_WIDTH + x;
+            VGA_BASE[pos * 2] = ' ';
+            VGA_BASE[pos * 2 + 1] = color;
+        }
+    }
+    cursor_x = 0;
+    cursor_y = 0;
+}
+
+// Вывод символа
+fn putchar(ch: u8) {
+    if ch == '\n' as u8 {
+        cursor_x = 0;
+        cursor_y = cursor_y + 1;
+        if cursor_y >= SCREEN_HEIGHT {
+            scroll();
+        }
+        return;
+    }
+    
+    if ch == '\t' as u8 {
+        for _ in 0..TAB_SIZE {
+            putchar(' ' as u8);
+        }
+        return;
+    }
+    
+    let pos = cursor_y * SCREEN_WIDTH + cursor_x;
+    VGA_BASE[pos * 2] = ch;
+    VGA_BASE[pos * 2 + 1] = color;
+    
+    cursor_x = cursor_x + 1;
+    if cursor_x >= SCREEN_WIDTH {
+        cursor_x = 0;
+        cursor_y = cursor_y + 1;
+        if cursor_y >= SCREEN_HEIGHT {
+            scroll();
+        }
+    }
+}
+
+// Прокрутка экрана
+fn scroll() {
+    for y in 1..SCREEN_HEIGHT {
+        for x in 0..SCREEN_WIDTH {
+            let src = y * SCREEN_WIDTH + x;
+            let dst = (y - 1) * SCREEN_WIDTH + x;
+            VGA_BASE[dst * 2] = VGA_BASE[src * 2];
+            VGA_BASE[dst * 2 + 1] = VGA_BASE[src * 2 + 1];
+        }
+    }
+    
+    for x in 0..SCREEN_WIDTH {
+        let pos = (SCREEN_HEIGHT - 1) * SCREEN_WIDTH + x;
+        VGA_BASE[pos * 2] = ' ';
+        VGA_BASE[pos * 2 + 1] = color;
+    }
+    
+    cursor_y = SCREEN_HEIGHT - 1;
+}
+
+// Вывод строки
+fn print(msg: *mut u8) {
+    let mut i = 0;
+    while msg[i] != 0 {
+        putchar(msg[i]);
+        i = i + 1;
+    }
+}
+
+// Вывод числа
+fn print_num(num: u32) {
+    if num == 0 {
+        putchar('0' as u8);
+        return;
+    }
+    
+    let mut digits = 0;
+    let mut temp = num;
+    while temp > 0 {
+        digits = digits + 1;
+        temp = temp / 10;
+    }
+    
+    let mut buffer = alloc(16);
+    temp = num;
+    let mut i = digits;
+    while i > 0 {
+        i = i - 1;
+        buffer[i] = (temp % 10) as u8 + '0' as u8;
+        temp = temp / 10;
+    }
+    
+    for i in 0..digits {
+        putchar(buffer[i]);
+    }
+}
+
+// Чтение клавиши из порта
+fn read_key() -> u8 {
+    asm {
+        mov dx, 0x60
+        in al, dx
+    }
+    return asm_result;
+}
+
+// Главная функция ядра
+export fn _start() {
+    clear_screen();
+    color = 0x0A; // зелёный
+    
+    print("========================================\n" as *mut u8);
+    print("     VertexOS v1.0 - Boot Successful!\n" as *mut u8);
+    print("========================================\n\n" as *mut u8);
+    
+    print("System information:\n" as *mut u8);
+    print("  - Mode: 32-bit protected\n" as *mut u8);
+    print("  - Memory: 128 MB\n" as *mut u8);
+    print("  - VGA: Text mode 80x25\n\n" as *mut u8);
+    
+    color = 0x0F; // белый
+    print("Type something: " as *mut u8);
+    
+    let mut i = 0;
+    let mut buffer = alloc(256);
+    
+    loop {
+        let key = read_key();
+        if key != 0 {
+            if key == '\r' as u8 { // Enter
+                print("\nYou typed: " as *mut u8);
+                for j in 0..i {
+                    putchar(buffer[j]);
+                }
+                print("\n\nType something: " as *mut u8);
+                i = 0;
+            } else if key == '\b' as u8 { // Backspace
+                if i > 0 {
+                    i = i - 1;
+                    // удаляем символ с экрана
+                    if cursor_x > 0 {
+                        cursor_x = cursor_x - 1;
+                        let pos = cursor_y * SCREEN_WIDTH + cursor_x;
+                        VGA_BASE[pos * 2] = ' ';
+                    }
+                }
+            } else {
+                buffer[i] = key;
+                i = i + 1;
+                putchar(key);
+            }
+        }
+    }
+}
+
+// Временный аллокатор
+fn alloc(size: u32) -> *mut u8 {
+    return 0x300000 as *mut u8;
+}

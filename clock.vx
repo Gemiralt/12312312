@@ -1,0 +1,21 @@
+// clock.vx - Цифровые часы
+
+let hour = 12;
+let minute = 0;
+let second = 0;
+
+vga[0] = 'C', 0x0F;
+vga[2] = 'L', 0x0F;
+vga[4] = 'O', 0x0F;
+vga[6] = 'C', 0x0F;
+vga[8] = 'K', 0x0F;
+
+// Цифры
+vga[32] = '0' + hour / 10, 0x0E;
+vga[34] = '0' + hour % 10, 0x0E;
+vga[36] = ':', 0x0E;
+vga[38] = '0' + minute / 10, 0x0E;
+vga[40] = '0' + minute % 10, 0x0E;
+vga[42] = ':', 0x0E;
+vga[44] = '0' + second / 10, 0x0E;
+vga[46] = '0' + second % 10, 0x0E;

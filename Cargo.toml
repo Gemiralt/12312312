@@ -1,0 +1,8 @@
+[package]
+name = "vertexvm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+winit = "0.28.7"
+softbuffer = "0.3.4"

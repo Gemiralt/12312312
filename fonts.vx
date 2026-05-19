@@ -1,0 +1,120 @@
+// fonts.vx - Шрифты для VertexOS
+
+// Простой шрифт 8x8 для латиницы и кириллицы
+fn get_char_bitmap(ch: u8) -> *mut u8 {
+    // Латинские буквы
+    if ch == 'A' as u8 { return "\x3C\x42\x81\xFF\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'B' as u8 { return "\xFE\x81\xFE\x81\x81\xFE\x00\x00" as *mut u8; }
+    if ch == 'C' as u8 { return "\x3C\x42\x80\x80\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'D' as u8 { return "\xFC\x82\x81\x81\x82\xFC\x00\x00" as *mut u8; }
+    if ch == 'E' as u8 { return "\xFF\x80\xFE\x80\x80\xFF\x00\x00" as *mut u8; }
+    if ch == 'F' as u8 { return "\xFF\x80\xFE\x80\x80\x80\x00\x00" as *mut u8; }
+    if ch == 'G' as u8 { return "\x3C\x42\x80\x8E\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'H' as u8 { return "\x81\x81\xFF\x81\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'I' as u8 { return "\x7E\x08\x08\x08\x08\x7E\x00\x00" as *mut u8; }
+    if ch == 'J' as u8 { return "\x07\x02\x02\x82\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'K' as u8 { return "\x81\x82\xFC\x82\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'L' as u8 { return "\x80\x80\x80\x80\x80\xFF\x00\x00" as *mut u8; }
+    if ch == 'M' as u8 { return "\x81\xC3\xA5\x99\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'N' as u8 { return "\x81\xC1\xA1\x91\x89\x81\x00\x00" as *mut u8; }
+    if ch == 'O' as u8 { return "\x3C\x42\x81\x81\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'P' as u8 { return "\xFE\x81\xFE\x80\x80\x80\x00\x00" as *mut u8; }
+    if ch == 'Q' as u8 { return "\x3C\x42\x81\x91\x42\x3C\x01\x00" as *mut u8; }
+    if ch == 'R' as u8 { return "\xFE\x81\xFE\x82\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'S' as u8 { return "\x7E\x80\x7C\x02\x82\x7C\x00\x00" as *mut u8; }
+    if ch == 'T' as u8 { return "\xFF\x08\x08\x08\x08\x08\x00\x00" as *mut u8; }
+    if ch == 'U' as u8 { return "\x81\x81\x81\x81\x81\x7E\x00\x00" as *mut u8; }
+    if ch == 'V' as u8 { return "\x81\x81\x42\x24\x18\x18\x00\x00" as *mut u8; }
+    if ch == 'W' as u8 { return "\x81\x81\x99\xA5\xC3\x81\x00\x00" as *mut u8; }
+    if ch == 'X' as u8 { return "\x81\x42\x24\x18\x24\x42\x81\x00" as *mut u8; }
+    if ch == 'Y' as u8 { return "\x81\x42\x24\x18\x08\x08\x00\x00" as *mut u8; }
+    if ch == 'Z' as u8 { return "\xFF\x02\x04\x08\x10\xFF\x00\x00" as *mut u8; }
+    
+    // Цифры
+    if ch == '0' as u8 { return "\x3C\x42\x81\x99\x42\x3C\x00\x00" as *mut u8; }
+    if ch == '1' as u8 { return "\x08\x38\x08\x08\x08\x7E\x00\x00" as *mut u8; }
+    if ch == '2' as u8 { return "\x7C\x02\x7C\x80\x80\x7E\x00\x00" as *mut u8; }
+    if ch == '3' as u8 { return "\x7C\x02\x7C\x02\x82\x7C\x00\x00" as *mut u8; }
+    if ch == '4' as u8 { return "\x04\x0C\x14\x24\xFE\x04\x00\x00" as *mut u8; }
+    if ch == '5' as u8 { return "\xFE\x80\xFC\x02\x82\x7C\x00\x00" as *mut u8; }
+    if ch == '6' as u8 { return "\x7C\x80\xFC\x82\x82\x7C\x00\x00" as *mut u8; }
+    if ch == '7' as u8 { return "\xFE\x02\x04\x08\x10\x10\x00\x00" as *mut u8; }
+    if ch == '8' as u8 { return "\x7C\x82\x7C\x82\x82\x7C\x00\x00" as *mut u8; }
+    if ch == '9' as u8 { return "\x7C\x82\x7E\x02\x82\x7C\x00\x00" as *mut u8; }
+    
+    // Русские буквы (основные)
+    if ch == 'А' as u8 { return "\x3C\x42\x81\xFF\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'Б' as u8 { return "\xFE\x80\xFE\x81\x81\xFE\x00\x00" as *mut u8; }
+    if ch == 'В' as u8 { return "\xFE\x81\xFE\x81\x81\xFE\x00\x00" as *mut u8; }
+    if ch == 'Г' as u8 { return "\xFF\x80\x80\x80\x80\x80\x00\x00" as *mut u8; }
+    if ch == 'Д' as u8 { return "\x08\x14\x22\x41\xFF\x81\x00\x00" as *mut u8; }
+    if ch == 'Е' as u8 { return "\xFF\x80\xFE\x80\x80\xFF\x00\x00" as *mut u8; }
+    if ch == 'Ё' as u8 { return "\xFF\x80\xFE\x80\x80\xFF\x00\x00" as *mut u8; }
+    if ch == 'Ж' as u8 { return "\x91\x52\x2C\xFF\x2C\x52\x91\x00" as *mut u8; }
+    if ch == 'З' as u8 { return "\x7E\x02\x7C\x02\x82\x7C\x00\x00" as *mut u8; }
+    if ch == 'И' as u8 { return "\x81\x83\x85\x89\x91\xC1\x00\x00" as *mut u8; }
+    if ch == 'К' as u8 { return "\x81\x82\xFC\x82\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'Л' as u8 { return "\x0F\x11\x21\x41\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'М' as u8 { return "\x81\xC3\xA5\x99\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'Н' as u8 { return "\x81\x81\xFF\x81\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'О' as u8 { return "\x3C\x42\x81\x81\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'П' as u8 { return "\xFF\x81\x81\x81\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'Р' as u8 { return "\xFE\x81\xFE\x80\x80\x80\x00\x00" as *mut u8; }
+    if ch == 'С' as u8 { return "\x3C\x42\x80\x80\x42\x3C\x00\x00" as *mut u8; }
+    if ch == 'Т' as u8 { return "\xFF\x08\x08\x08\x08\x08\x00\x00" as *mut u8; }
+    if ch == 'У' as u8 { return "\x81\x42\x24\x18\x08\x08\x00\x00" as *mut u8; }
+    if ch == 'Ф' as u8 { return "\x14\x3E\x55\x55\x3E\x14\x00\x00" as *mut u8; }
+    if ch == 'Х' as u8 { return "\x81\x42\x24\x18\x24\x42\x81\x00" as *mut u8; }
+    if ch == 'Ц' as u8 { return "\x81\x81\x81\x81\xFF\x01\x00\x00" as *mut u8; }
+    if ch == 'Ч' as u8 { return "\x81\x81\x7F\x01\x01\x01\x00\x00" as *mut u8; }
+    if ch == 'Ш' as u8 { return "\x88\x88\x88\x88\xFF\x00\x00\x00" as *mut u8; }
+    if ch == 'Щ' as u8 { return "\x88\x88\x88\x88\xFF\x01\x00\x00" as *mut u8; }
+    if ch == 'Ъ' as u8 { return "\x80\x80\xF8\x84\x84\xF8\x00\x00" as *mut u8; }
+    if ch == 'Ы' as u8 { return "\x81\x81\x85\xF1\x81\x81\x00\x00" as *mut u8; }
+    if ch == 'Ь' as u8 { return "\x80\x80\xF8\x84\x84\xF8\x00\x00" as *mut u8; }
+    if ch == 'Э' as u8 { return "\x7C\x02\x3E\x02\x82\x7C\x00\x00" as *mut u8; }
+    if ch == 'Ю' as u8 { return "\x22\x22\x3E\x22\x22\x1C\x00\x00" as *mut u8; }
+    if ch == 'Я' as u8 { return "\x3E\x22\x3E\x22\x22\x3E\x00\x00" as *mut u8; }
+    
+    // Символы
+    if ch == ' ' as u8 { return "\x00\x00\x00\x00\x00\x00\x00\x00" as *mut u8; }
+    if ch == '!' as u8 { return "\x08\x08\x08\x08\x00\x08\x00\x00" as *mut u8; }
+    if ch == '?' as u8 { return "\x38\x44\x08\x10\x00\x10\x00\x00" as *mut u8; }
+    if ch == '.' as u8 { return "\x00\x00\x00\x00\x00\x18\x00\x00" as *mut u8; }
+    if ch == ',' as u8 { return "\x00\x00\x00\x00\x18\x10\x20\x00" as *mut u8; }
+    if ch == ':' as u8 { return "\x00\x18\x00\x00\x18\x00\x00\x00" as *mut u8; }
+    if ch == '+' as u8 { return "\x00\x08\x08\x3E\x08\x08\x00\x00" as *mut u8; }
+    if ch == '-' as u8 { return "\x00\x00\x00\x3E\x00\x00\x00\x00" as *mut u8; }
+    if ch == '=' as u8 { return "\x00\x3E\x00\x00\x3E\x00\x00\x00" as *mut u8; }
+    if ch == '*' as u8 { return "\x14\x08\x3E\x08\x14\x00\x00\x00" as *mut u8; }
+    if ch == '/' as u8 { return "\x02\x04\x08\x10\x20\x40\x00\x00" as *mut u8; }
+    if ch == '(' as u8 { return "\x06\x08\x10\x10\x08\x06\x00\x00" as *mut u8; }
+    if ch == ')' as u8 { return "\x60\x10\x08\x08\x10\x60\x00\x00" as *mut u8; }
+    
+    // По умолчанию - пробел
+    return "\x00\x00\x00\x00\x00\x00\x00\x00" as *mut u8;
+}
+
+fn draw_char(x: i32, y: i32, ch: u8, color: u32) {
+    let bitmap = get_char_bitmap(ch);
+    let mut row = 0;
+    while row < 8 {
+        let byte = bitmap[row];
+        let mut col = 0;
+        while col < 8 {
+            if (byte >> (7 - col)) & 1 != 0 {
+                draw_pixel(x + col, y + row, color);
+            }
+            col = col + 1;
+        }
+        row = row + 1;
+    }
+}
+
+fn draw_string(x: i32, y: i32, text: *mut u8, color: u32) {
+    let mut i = 0;
+    while text[i] != 0 {
+        draw_char(x + i * 9, y, text[i], color);
+        i = i + 1;
+    }
+}

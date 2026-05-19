@@ -1,0 +1,18 @@
+// kernel/src/boot.vx
+// Загрузчик, который умеет читать и выполнять код
+
+export fn _start() -> void {
+    let vga = 0xB8000 as *mut u8;
+    let msg = "VertexC Bootloader v0.1";
+    
+    for i in 0..msg.len() {
+        vga[i * 2] = msg[i];
+        vga[i * 2 + 1] = 0x0F;
+    }
+    
+    // Загружаем и запускаем kernel_main
+    let kernel_addr = 0x100000 as *mut fn() -> void;
+    (*kernel_addr)();
+    
+    loop {}
+}

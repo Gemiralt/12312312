@@ -1,0 +1,29 @@
+struct GDTEntry {
+    limit_low: u16,
+    base_low: u16,
+    base_mid: u8,
+    access: u8,
+    limit_high: u4,
+    flags: u4,
+    base_high: u8,
+}
+
+static gdt: [GDTEntry; 3] = [
+    GDTEntry{0,0,0,0,0,0,0},  // null
+    GDTEntry{0xFFFF,0,0,0x9A,0x0F,0xC,0}, // code
+    GDTEntry{0xFFFF,0,0,0x92,0x0F,0xC,0}, // data
+];
+
+fn gdt_flush() -> void {
+    asm {
+        "lgdt [gdt_ptr]"
+        "mov ax, 0x10"
+        "mov ds, ax"
+        "mov es, ax"
+        "mov fs, ax"
+        "mov gs, ax"
+        "mov ss, ax"
+        "jmp 0x08:flush2"
+        "flush2: ret"
+    }
+}
