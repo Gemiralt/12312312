@@ -1,0 +1,162 @@
+// compiler.vx - Сам компилятор на VertexC!
+
+export fn compile(source: *mut u8) -> *mut u8 {
+    let tokens = tokenize(source);
+    let ast = parse(tokens);
+    let output = codegen(ast);
+    return output;
+}
+
+fn tokenize(source: *mut u8) -> *mut Token {
+    let mut tokens = alloc(1024);
+    let mut pos = 0;
+    let mut i = 0;
+    
+    while source[i] != 0 {
+        let ch = source[i];
+        
+        if ch >= b'0' && ch <= b'9' {
+            let mut num = 0;
+            while source[i] >= b'0' && source[i] <= b'9' {
+                num = num * 10 + (source[i] - b'0') as u64;
+                i = i + 1;
+            }
+            tokens[pos].kind = 1; // NUMBER
+            tokens[pos].value = num;
+            pos = pos + 1;
+        }
+        else if (ch >= b'a' && ch <= b'z') || (ch >= b'A' && ch <= b'Z') {
+            let start = i;
+            while (source[i] >= b'a' && source[i] <= b'z') || (source[i] >= b'A' && source[i] <= b'Z') {
+                i = i + 1;
+            }
+            // Копируем имя
+            let name = alloc(32);
+            let mut j = 0;
+            while start + j < i {
+                name[j] = source[start + j];
+                j = j + 1;
+            }
+            name[j] = 0;
+            
+            if strcmp(name, "vga") == 0 {
+                tokens[pos].kind = 2; // VGA
+            } else if strcmp(name, "let") == 0 {
+                tokens[pos].kind = 3; // LET
+            } else if strcmp(name, "fn") == 0 {
+                tokens[pos].kind = 4; // FN
+            } else {
+                tokens[pos].kind = 5; // IDENT
+            }
+            tokens[pos].str = name;
+            pos = pos + 1;
+        }
+        else {
+            i = i + 1;
+        }
+    }
+    
+    tokens[pos].kind = 0; // EOF
+    return tokens;
+}
+
+fn parse(tokens: *mut Token) -> *mut AstNode {
+    let mut ast = alloc(4096);
+    let mut pos = 0;
+    let mut i = 0;
+    
+    while tokens[i].kind != 0 {
+        if tokens[i].kind == 2 { // VGA
+            i = i + 1; // пропускаем vga
+            if tokens[i].kind == 6 { // [
+                i = i + 1;
+                let index = tokens[i].value;
+                i = i + 1;
+                if tokens[i].kind == 7 { // ]
+                    i = i + 1;
+                    if tokens[i].kind == 8 { // =
+                        i = i + 1;
+                        let value = tokens[i].value;
+                        i = i + 1;
+                        let color = 0x0F;
+                        if tokens[i].kind == 9 { // ,
+                            i = i + 1;
+                            color = tokens[i].value;
+                            i = i + 1;
+                        }
+                        ast[pos].op = 1; // ARRAY_ASSIGN
+                        ast[pos].index = index;
+                        ast[pos].value = value;
+                        ast[pos].color = color;
+                        pos = pos + 1;
+                    }
+                }
+            }
+        }
+        i = i + 1;
+    }
+    
+    ast[pos].op = 0; // END
+    return ast;
+}
+
+fn codegen(ast: *mut AstNode) -> *mut u8 {
+    let mut output = alloc(4096);
+    let mut pos = 0;
+    let mut i = 0;
+    
+    // MOV EAX, 0xB8000
+    output[pos] = 0xB8; pos = pos + 1;
+    output[pos] = 0x00; pos = pos + 1;
+    output[pos] = 0x80; pos = pos + 1;
+    output[pos] = 0x0B; pos = pos + 1;
+    output[pos] = 0x00; pos = pos + 1;
+    
+    while ast[i].op != 0 {
+        if ast[i].op == 1 {
+            // MOV [EAX + index*2], value_with_color
+            let imm = (ast[i].color << 8) | (ast[i].value & 0xFF);
+            output[pos] = 0xC7; pos = pos + 1;  // MOV
+            output[pos] = 0x40; pos = pos + 1;  // [EAX + disp8]
+            output[pos] = ast[i].index as u8; pos = pos + 1;
+            output[pos] = imm as u8; pos = pos + 1;
+            output[pos] = (imm >> 8) as u8; pos = pos + 1;
+            output[pos] = 0x00; pos = pos + 1;
+            output[pos] = 0x00; pos = pos + 1;
+        }
+        i = i + 1;
+    }
+    
+    // HLT
+    output[pos] = 0xF4;
+    
+    return output;
+}
+
+// Структуры
+struct Token {
+    kind: u64,
+    value: u64,
+    str: *mut u8,
+}
+
+struct AstNode {
+    op: u64,
+    index: u64,
+    value: u64,
+    color: u64,
+}
+
+// Вспомогательные функции
+fn alloc(size: u64) -> *mut u8 {
+    return 0x200000 as *mut u8; // временно
+}
+
+fn strcmp(a: *mut u8, b: *mut u8) -> u64 {
+    let mut i = 0;
+    while a[i] != 0 && b[i] != 0 {
+        if a[i] != b[i] { return 0; }
+        i = i + 1;
+    }
+    return if a[i] == 0 && b[i] == 0 { 1 } else { 0 };
+}

@@ -1,0 +1,5 @@
+let x = 72;
+let y = 105;
+
+vga[0] = x;
+vga[2] = y;
